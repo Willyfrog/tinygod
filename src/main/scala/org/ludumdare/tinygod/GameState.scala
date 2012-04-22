@@ -23,6 +23,7 @@ class GameState(var stateID:Int = -1) extends BasicGameState{
   val INIPPL = 10
   var rayo: Animation = null
   var nextDraw: ArrayBuffer[(Float, Float, Animation)] = new ArrayBuffer[(Float, Float, Animation)]()
+  var end:Boolean = false
 
   def GameState (id:Int){ //herencia de java?
     stateID = id
@@ -34,6 +35,7 @@ class GameState(var stateID:Int = -1) extends BasicGameState{
   override def init(gc:GameContainer, sbg:StateBasedGame){
     println("Initialized Game")
     land = new Image("world/land86.png")
+    end = false
     for (_ <- (1 to INIPPL)) {
       ppl += new Person(Random.nextInt(800), Random.nextInt(600))
     }
@@ -76,28 +78,42 @@ class GameState(var stateID:Int = -1) extends BasicGameState{
   override def update(gc:GameContainer, sbg:StateBasedGame, delta:Int){
     //current = new java.util.Date()
     if (gc.getInput.isMouseButtonDown(Input.MOUSE_LEFT_BUTTON)) {
-      tryHit(gc.getInput.getMouseX, gc.getInput.getMouseY, rayo)
+      if (!end)
+        tryHit(gc.getInput.getMouseX, gc.getInput.getMouseY, rayo)
+      else
+      {
+        init(gc,sbg)
+        sbg.enterState(Game.MENUSTATE)
+      }
+
     }
     //update people
     ppl.foreach(p => p.update(delta))
     removeDead()
     if (ppl.length == 0) {
-      sbg.enterState(Game.MENUSTATE) //TODO: hacer una pantalla de gameover
+      end = true
     }
+
 
   }
   override def render(gc:GameContainer, sbg:StateBasedGame, g:Graphics){
     //g.setColor(Color.white)
     //g.drawString("Hello tinygod, %s".format(current), 200, 10)
-    land.draw(0, 0)
-    g.drawString("Tiniers: %s Souls Collected: %s".format(ppl.length, souls), 20, 580)
-
-    for (p: Person <- ppl) {
-      g.drawAnimation(p.currAni, p.x.toFloat, p.y.toFloat)
+    if (!end) {
+      land.draw(0, 0)
+      for (p: Person <- ppl) {
+        g.drawAnimation(p.currAni, p.x.toFloat, p.y.toFloat)
+      }
+      for (p: (Float, Float, Animation) <- nextDraw)
+        g.drawAnimation(p._3, p._1, p._2) //TODO: check
+      nextDraw.clear()
+    } else {
+      g.setColor(Color.darkGray)
+      g.drawString("Every person in this tiny world has passed away", 20, 300)
+      g.drawString("Click anywhere to go back to menu", 25,310)
     }
-    for (p: (Float, Float, Animation) <- nextDraw)
-      g.drawAnimation(p._3, p._1, p._2) //TODO: check
-    nextDraw.clear()
+
+    g.drawString("Tiniers: %s Souls Collected: %s".format(ppl.length, souls), 20, 580)
   }
 
 }

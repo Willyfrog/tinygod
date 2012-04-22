@@ -3,6 +3,7 @@ package org.ludumdare.tinygod
 import org.newdawn.slick.{Animation, SpriteSheet}
 import scala.util.Random
 import math._
+
 import org.ludumdare.tinygod.Animator
 
 
@@ -16,62 +17,69 @@ import org.ludumdare.tinygod.Animator
 
 class Person(var x:Double, var y:Double) {
 
-  val spri: SpriteSheet = new SpriteSheet("man/man.png", 16,16)
+ /* val spri: SpriteSheet = new SpriteSheet("man/man.png", 16,16)
   val aniLeft: Animation = new Animation()
   val aniRight: Animation = new Animation()
   val aniUp: Animation = new Animation()
-  val aniDown: Animation = new Animation()
-  var currAni:Animation = aniDown
+  val aniDown: Animation = new Animation() */
+
   val SPEED = 0.1
   var state: Boolean = false // true: walk, false: stop
   var destination: (Double, Double) = (0,0) //where is he/she headed? IMPORTANT is relative to his/her position
   var sleep: Int = 0
   var age:Int = 0
+  var ageRange:String = "boy"
+  var orientation:String = "Down"
   var alive:Boolean = true
   var happiness:Int = 50
 
-  //LoadAnimations
-  for (frame:Int <- (0 to 2)) {
-    aniLeft.addFrame(spri.getSprite(frame,0), 150)
-    aniRight.addFrame(spri.getSprite(frame,0).getFlippedCopy(true,false), 150)
-  }
-  for (frame:Int <- (3 to 5)) {
-    aniUp.addFrame(spri.getSprite(frame,0), 150)
-  }
-  for (frame:Int <- (6 to 8)) {
-    aniDown.addFrame(spri.getSprite(frame,0), 150)
-  }
-
   def isHit(hx: Float, hy: Float): Boolean =
-    return ((x <= hx) && (hx <= x + 16) && (y <= hy) && (hy <= y+16))
+    ((x <= hx) && (hx <= x + 16) && (y <= hy) && (hy <= y+16))
+
+  def currAni:Animation={
+    Animator.animaciones(ageRange)(orientation)
+  }
 
   def newDestination{
     destination = (Random.nextInt(800)-400,Random.nextInt(600)-300) //TODO: change to parameter
     //print("mi destino es %f,%f", destination)
     if (destination._1.abs >= destination._2.abs){
       if (destination._1 <=0)
-        currAni = aniLeft
+        orientation = "Left"
       else
-        currAni = aniRight
+        orientation = "Right"
     }
     else{
       if (destination._2 <=0)
-        currAni = aniUp
+        orientation = "Up"
       else
-        currAni = aniDown
+        orientation = "Down"
     }
 
   }
-  def newSleep{
+  def newSleep(){
     sleep = Random.nextInt(1000)
   }
 
+  def edad(){
+    if (age<100)
+      ageRange = "boy"
+    else if (age<10000)
+      ageRange = "man"
+    else
+    {
+      ageRange = "oldman"
+      if (Random.nextInt(50)==1){ //1 entre 50 posibilidades a cada update
+        alive = false
+        happiness += 20
+      }
+    }
+  }
+
   def update(delta:Int){
+    edad()
     if (alive) {
       age += delta
-      if (age>=100000 && Random.nextInt(7)==1)
-        alive = false
-        happiness += 20 //dying of old is usually a good thing
       if (state) {
         //move!
         //get displacement

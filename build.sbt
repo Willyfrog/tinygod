@@ -1,7 +1,5 @@
 import AssemblyKeys._ // put this at the top of the file
 
-assemblySettings
-
 seq(slickSettings: _*)
 
 seq(oldLwjglSettings: _*)
@@ -14,10 +12,12 @@ name := "tinygod"
 
 organization := "org.ludumdare"
 
-mainClass in assembly := Some("Game")
+seq(com.github.retronym.SbtOneJar.oneJarSettings: _*)
 
-excludedFiles in assembly := { (bases: Seq[File]) => bases flatMap { base =>  (base / ".idea" * "*").get collect {
-   case f => f
- }
-}}
+libraryDependencies += "commons-lang" % "commons-lang" % "2.6"
 
+mainClass in oneJar := Some("org.ludumdare.tinygod.Game")
+
+assemblySettings
+
+mainClass in assembly := Some("org.ludumdare.tinygod.Game")
