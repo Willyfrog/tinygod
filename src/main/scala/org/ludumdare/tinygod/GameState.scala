@@ -6,6 +6,7 @@ import scala.util.Random
 import org.newdawn.slick.tiled._
 import scala.Int
 import org.newdawn.slick._
+import net.java.games.input.Event
 
 /**
  * Created with IntelliJ IDEA.
@@ -23,8 +24,12 @@ class GameState(var stateID:Int = -1) extends BasicGameState{
   var ppl: ArrayBuffer[Person] = new ArrayBuffer[Person]()
   var souls: Int = 0 //Score
   var rayo: Animation = null
+  var raysfx: Sound = null
   var love: Animation = null
-  var nextDraw: ArrayBuffer[(Float, Float, Animation)] = new ArrayBuffer[(Float, Float, Animation)]()
+  var lovsfx: Sound = null
+  var explosion: Animation = null
+  var explosfx: Sound = null
+  var nextDraw: ArrayBuffer[Evento] = new ArrayBuffer[Evento]()
   var end:Boolean = false
   var position:(Int,Int) = (0,0)
   val godSpeed:Int = 5
@@ -57,11 +62,19 @@ class GameState(var stateID:Int = -1) extends BasicGameState{
     for (f<- (0 to 4)) {
       love.addFrame(lovSpri.getSprite(f,0), 200)
     }
+    val expSpri: SpriteSheet = new SpriteSheet("effects/explosion.png",64,64)
+    explosion = new Animation()
+    for (f<- (0 to 3)) {
+      explosion.addFrame(expSpri.getSprite(f,0), 200)
+    }
+    raysfx = new Sound("sounds/ray.wav")
+    lovsfx = new Sound("sounds/love.wav")
+    explosfx = new Sound("sounds/explosion.wav")
 
   }
 
 
-  def tryHit(x: Float, y: Float, ani: Animation) {
+  def tryHit(x: Float, y: Float, ani:Animation,sfx:Sound, hmod:Int) {
     /*
     ani is the animation to run in case it hits a person
      */
@@ -69,25 +82,29 @@ class GameState(var stateID:Int = -1) extends BasicGameState{
     //ppl.foreach(p => h |= p.isHit(x,y))
     for (p <- ppl) {
       if (p.isHit(x, y)) {
-        p.kill(-30)
+        p.kill(hmod)
         h = true
       }
     }
     if (h)
-      nextDraw += ((x, y, ani))
+      nextDraw += (new Evento(sfx,ani,x, y, hmod))
   }
 
   def tryImpregnate(p:Person,l:ArrayBuffer[Person]){
+    var done = false
     if (l.length >0){
       if (p.male){ //only man try
         var p2 = l.head
         if ((!p.walking)&&(!p2.walking)){ //no fucking and walking at the same time!
         //if (!p.walking){ //no fucking and walking at the same time!
           if (p2.impregnate(p.male)){
-            nextDraw += ((((p.x+p2.x)/2).toFloat, ((p.y+p2.y)/2).toFloat, love)) //Love!
+            nextDraw += new Evento(lovsfx,love,((p.x+p2.x)/2).toFloat,((p.y+p2.y)/2).toFloat,20)
+            done = true //once per update, maybe we need another counter?
+
           }
         }
-        tryImpregnate(p, l.tail)
+        if (!done)
+          tryImpregnate(p, l.tail)
       }
     }
   }
@@ -108,7 +125,19 @@ class GameState(var stateID:Int = -1) extends BasicGameState{
           p.pregnant = -1
         }
 
-        if (l.length>1)
+        if (p.blowupTime == 0){
+          //nextDraw += new Evento(explosfx,explosion,p.x.toFloat, p.y.toFloat,-30)
+          tryHit(p.x.toFloat,p.y.toFloat,explosion,explosfx,-30)
+        }
+        //happiness is affected by events
+        for (e<-nextDraw){
+          if (p.isCloseTo(e.x,e.y,60))
+          {
+            p.happiness += e.hmod
+          }
+        }
+
+        if ((l.length>1) && (l.length < Comun.MAXPPL))
           tryImpregnate(p,l.tail)
       }
       populationControl(l.tail, delta)
@@ -119,7 +148,7 @@ class GameState(var stateID:Int = -1) extends BasicGameState{
     //current = new java.util.Date()
     if (!pause){
       if (gc.getInput.isMouseButtonDown(Input.MOUSE_LEFT_BUTTON)) {
-        tryHit(gc.getInput.getMouseX, gc.getInput.getMouseY, rayo)
+        tryHit(gc.getInput.getMouseX, gc.getInput.getMouseY,rayo,raysfx,-10)
       }
       if (gc.getInput.isKeyDown(Input.KEY_W) && position._2 >0) {
         position = (position._1, position._2 + godSpeed * delta)
@@ -143,6 +172,14 @@ class GameState(var stateID:Int = -1) extends BasicGameState{
           sbg.enterState(Comun.ENDSTATE)
         }
       }
+      //update events
+      for (e<- nextDraw.clone()){
+        e.tick(delta)
+        e.play()
+        if (e.timeout<=0)
+          nextDraw -= e
+      }
+
     }
     if (gc.getInput.isKeyPressed(Input.KEY_ESCAPE)) {
       pause = !pause
@@ -151,8 +188,6 @@ class GameState(var stateID:Int = -1) extends BasicGameState{
     if (pause && gc.getInput.isKeyPressed(Input.KEY_Q)){
       gc.exit()
     }
-
-
 
   }
   override def render(gc:GameContainer, sbg:StateBasedGame, g:Graphics){
@@ -165,8 +200,8 @@ class GameState(var stateID:Int = -1) extends BasicGameState{
       //g.drawAnimation(p.currAni, p.x.toFloat, p.y.toFloat)
       p.currAni.draw(p.x.toFloat+position._1, p.y.toFloat+position._2)
     }
-    for (na: (Float, Float, Animation) <- nextDraw)
-      na._3.draw(na._1 - na._3.getWidth/2, na._2 - na._3.getHeight/2)
+    for (na: Evento <- nextDraw)
+      na.ani.draw(na.x - na.ani.getWidth/2, na.y - na.ani.getHeight/2)
     nextDraw.clear()
     marco.draw(0,0)
     g.drawString("Tiniers: %s Souls Collected: %s".format(ppl.length, souls), 20, 580)

@@ -3,7 +3,7 @@ package org.ludumdare.tinygod
 import org.newdawn.slick.{Animation, SpriteSheet}
 import scala.util.Random
 import math._
-
+import org.ludumdare.tinygod.Person._
 
 
 /**
@@ -23,6 +23,8 @@ class Person(var x:Double, var y:Double, val initialAge:Int = 0) {
   val aniDown: Animation = new Animation() */
 
   val SPEED = 0.1
+  val MANHOOD = 3000
+  val ELDER = 10000
   var walking: Boolean = false // true: walk, false: stop
   var destination: (Double, Double) = (0,0) //where is he/she headed? IMPORTANT is relative to his/her position
   var sleep: Int = 0
@@ -30,10 +32,18 @@ class Person(var x:Double, var y:Double, val initialAge:Int = 0) {
   var ageRange:String = "boy"
   var orientation:String = "Down"
   var alive:Boolean = true
-  var happiness:Int = 50
+  var happiness:Int = Random.nextInt(50) - 20
   var pregnant = -1 // -1: not pregnant, any other: time to deliver child
   val male:Boolean = Random.nextBoolean()
-  val terrorist:Boolean = (Random.nextInt(20)==1)
+  var blowupTime:Int = -1
+  if (terrorist)
+    blowupTime = MANHOOD + Random.nextInt(ELDER-MANHOOD)
+
+  def terrorist():Boolean ={
+    if (blowupTime == -1 && happiness < 0)
+       blowupTime = MANHOOD - age + Random.nextInt(ELDER-MANHOOD)
+    return happiness < 0
+  }
 
   def isHit(hx: Float, hy: Float): Boolean =
     ((x <= hx) && (hx <= x + 20) && (y <= hy) && (hy <= y+20)) //a little bigger than the sprite to make it easier
@@ -106,6 +116,11 @@ class Person(var x:Double, var y:Double, val initialAge:Int = 0) {
         pregnant = 0 //newborn!
     if (alive) {
       age += delta
+      if (terrorist())
+        if (blowupTime > delta)
+          blowupTime -= delta
+        else
+          blowupTime = 0 //KA-BOOM
       if (walking) {
         //move!
         //get displacement

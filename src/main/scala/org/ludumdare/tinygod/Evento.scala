@@ -11,14 +11,24 @@ import org.newdawn.slick.{Animation, Sound}
  * To change this template use File | Settings | File Templates.
  */
 
-class Event (val sfx:Sound, val ani:Animation){
-  var timeout:Int = 20
+class Evento (val sfx:Sound, val ani:Animation, val x:Float, val y:Float, var hmod:Int){
+  // hmod: modifier for seeing the effect
+  var timeout:Int = 50
+  var played = false
 
   def tick(delta:Int){
+    hmod = 0 //only affects once
     if (timeout>delta)
       timeout-=delta
     else
       timeout = 0
+  }
+
+  def play(){
+    if (!played){
+      played = true
+      sfx.play()
+    }
   }
 
 }
