@@ -3,6 +3,7 @@ package org.ludumdare.tinygod
 import org.newdawn.slick.{Animation, SpriteSheet}
 import scala.util.Random
 import math._
+import org.ludumdare.tinygod.Animator
 
 
 /**

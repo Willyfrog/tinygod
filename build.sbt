@@ -16,3 +16,8 @@ organization := "org.ludumdare"
 
 mainClass in assembly := Some("Game")
 
+excludedFiles in assembly := { (bases: Seq[File]) => bases flatMap { base =>  (base / ".idea" * "*").get collect {
+   case f => f
+ }
+}}
+
