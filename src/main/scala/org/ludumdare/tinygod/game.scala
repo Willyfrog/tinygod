@@ -1,7 +1,6 @@
 package org.ludumdare.tinygod
 
 import org.newdawn.slick._
-import org.ludumdare.tinygod.Person
 import scala.util.Random
 import collection.mutable.ArrayBuffer
 import state.StateBasedGame
@@ -14,22 +13,22 @@ object Game {
     container.setTargetFrameRate(60)
     container.start
   }
-  val MENUSTATE = 0
-  val GAMESTATE = 1
+
+  var souls = 0 //ultima puntuacion
 }
 
 class Game extends StateBasedGame("Tinygod") {
-  val RESX = 800
-  val RESY = 600
-  val MENUSTATE = 0
-  val GAMESTATE = 1
+
+
   //var current = new java.util.Date()
-  this.addState(new MenuState(MENUSTATE))
-  this.addState(new GameState(GAMESTATE))
+  this.addState(new MenuState(Comun.MENUSTATE))
+  this.addState(new GameState(Comun.GAMESTATE))
+  this.addState(new EndState(Comun.ENDSTATE))
 
   override def initStatesList(gc:GameContainer){
-    getState(MENUSTATE).init(gc,this)
-    getState(GAMESTATE).init(gc,this)
+    getState(Comun.MENUSTATE).init(gc,this)
+    getState(Comun.GAMESTATE).init(gc,this)
+    getState(Comun.ENDSTATE).init(gc,this)
   }
 
 }
