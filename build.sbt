@@ -1,5 +1,7 @@
 import AssemblyKeys._ // put this at the top of the file
 
+seq(assemblySettings: _*)
+
 seq(slickSettings: _*)
 
 seq(oldLwjglSettings: _*)
@@ -18,6 +20,6 @@ libraryDependencies += "commons-lang" % "commons-lang" % "2.6"
 
 mainClass in oneJar := Some("org.ludumdare.tinygod.Game")
 
-assemblySettings
+exportJars := true
 
 mainClass in assembly := Some("org.ludumdare.tinygod.Game")

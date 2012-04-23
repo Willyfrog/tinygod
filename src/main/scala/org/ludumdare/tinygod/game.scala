@@ -19,7 +19,6 @@ object Game {
 
 class Game extends StateBasedGame("Tinygod") {
 
-
   //var current = new java.util.Date()
   this.addState(new MenuState(Comun.MENUSTATE))
   this.addState(new GameState(Comun.GAMESTATE))

@@ -19,7 +19,7 @@ import net.java.games.input.Event
 class GameState(var stateID:Int = -1) extends BasicGameState{
 
   var land: Image = null
-  var map: TiledMap = null
+  var map: TiledMapLoop = null
   var marco: Image = null
   var ppl: ArrayBuffer[Person] = new ArrayBuffer[Person]()
   var souls: Int = 0 //Score
@@ -45,7 +45,8 @@ class GameState(var stateID:Int = -1) extends BasicGameState{
   override def init(gc:GameContainer, sbg:StateBasedGame){
     println("Initialized Game")
     land = new Image("world/land86.png")
-    map = new TiledMap("world/firstmap.tmx")
+    //map = new TiledMap("world/firstmap.tmx")
+    map = new TiledMapLoop("world/firstmap.tmx",Comun.RESX,Comun.RESY)
     marco = new Image("world/marco.png")
     end = false
     souls = 0
@@ -121,8 +122,8 @@ class GameState(var stateID:Int = -1) extends BasicGameState{
       else{
         p.update(delta)
         if (p.pregnant == 0){
-          ppl += new Person(p.x+8, p.y+8) //newborn
           p.pregnant = -1
+          ppl += new Person(p.x+8, p.y+8) //newborn
         }
 
         if (p.blowupTime == 0){
@@ -150,16 +151,16 @@ class GameState(var stateID:Int = -1) extends BasicGameState{
       if (gc.getInput.isMouseButtonDown(Input.MOUSE_LEFT_BUTTON)) {
         tryHit(gc.getInput.getMouseX, gc.getInput.getMouseY,rayo,raysfx,-10)
       }
-      if (gc.getInput.isKeyDown(Input.KEY_W) && position._2 >0) {
+      if (gc.getInput.isKeyDown(Input.KEY_W)) {
         position = (position._1, position._2 + godSpeed * delta)
       }
-      if (gc.getInput.isKeyDown(Input.KEY_S) && position._2 < Comun.MAXY) {
+      if (gc.getInput.isKeyDown(Input.KEY_S)) {
         position = (position._1, position._2 - godSpeed * delta)
       }
-      if (gc.getInput.isKeyDown(Input.KEY_A) && position._1 < Comun.MAXX) {
+      if (gc.getInput.isKeyDown(Input.KEY_A)) {
         position = (position._1 + godSpeed * delta, position._2)
       }
-      if (gc.getInput.isKeyDown(Input.KEY_D) && position._1 > 0) {
+      if (gc.getInput.isKeyDown(Input.KEY_D)) {
         position = (position._1 - godSpeed * delta, position._2)
       }
       //update people
@@ -194,7 +195,7 @@ class GameState(var stateID:Int = -1) extends BasicGameState{
     //g.setColor(Color.white)
     //g.drawString("Hello tinygod, %s".format(current), 200, 10)
       //land.draw(0, 0)
-    map.render(position._1,position._2)
+    map.drawLoop(position._1,position._2)
 
     for (p: Person <- ppl) {
       //g.drawAnimation(p.currAni, p.x.toFloat, p.y.toFloat)
