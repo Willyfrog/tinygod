@@ -14,8 +14,8 @@ object Comun {
   val ENDSTATE = 2
   val RESX = 800
   val RESY = 600
-  val MAXX = 1600
-  val MAXY = 1600
+  val MAXX = 1600 //Dependen del mapa
+  val MAXY = 1600 // TODO: FIXME
   var souls:Int = 0
 
   val INIPPL = 40

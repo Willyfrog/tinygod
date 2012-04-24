@@ -196,6 +196,7 @@ class GameState(var stateID:Int = -1) extends BasicGameState{
     }
 
   }
+
   override def render(gc:GameContainer, sbg:StateBasedGame, g:Graphics){
     //g.setColor(Color.white)
     //g.drawString("Hello tinygod, %s".format(current), 200, 10)
@@ -204,7 +205,7 @@ class GameState(var stateID:Int = -1) extends BasicGameState{
 
     for (p: Person <- ppl) {
       //g.drawAnimation(p.currAni, p.x.toFloat, p.y.toFloat)
-      p.currAni.draw(posX + p.x.toFloat, posY + p.y.toFloat)
+      p.currAni.draw(p.x.toFloat-posX, p.y.toFloat - posY)
     }
     for (na: Evento <- nextDraw)
       na.ani.draw(na.x - na.ani.getWidth/2, na.y - na.ani.getHeight/2)
