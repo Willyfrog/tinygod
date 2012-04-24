@@ -31,8 +31,9 @@ class GameState(var stateID:Int = -1) extends BasicGameState{
   var explosfx: Sound = null
   var nextDraw: ArrayBuffer[Evento] = new ArrayBuffer[Evento]()
   var end:Boolean = false
-  var position:(Int,Int) = (0,0)
-  val godSpeed:Int = 5
+  var posX:Int = 0
+  var posY:Int = 0
+  val godSpeed:Int = 1
   var pause:Boolean = false
 
   def GameState (id:Int){ //herencia de java?
@@ -151,17 +152,21 @@ class GameState(var stateID:Int = -1) extends BasicGameState{
       if (gc.getInput.isMouseButtonDown(Input.MOUSE_LEFT_BUTTON)) {
         tryHit(gc.getInput.getMouseX, gc.getInput.getMouseY,rayo,raysfx,-10)
       }
-      if (gc.getInput.isKeyDown(Input.KEY_W)) {
-        position = (position._1, position._2 + godSpeed * delta)
-      }
       if (gc.getInput.isKeyDown(Input.KEY_S)) {
-        position = (position._1, position._2 - godSpeed * delta)
+        posY = posY + godSpeed * delta
+        if (posY>Comun.MAXY) posY -= Comun.MAXY
       }
-      if (gc.getInput.isKeyDown(Input.KEY_A)) {
-        position = (position._1 + godSpeed * delta, position._2)
+      if (gc.getInput.isKeyDown(Input.KEY_W)) {
+        posY -= godSpeed * delta
+        if (posY<0) posY+=Comun.MAXY
       }
       if (gc.getInput.isKeyDown(Input.KEY_D)) {
-        position = (position._1 - godSpeed * delta, position._2)
+        posX = posX + godSpeed * delta
+        if (posX>Comun.MAXX) posX-=Comun.MAXX
+      }
+      if (gc.getInput.isKeyDown(Input.KEY_A)) {
+        posX -= godSpeed * delta
+        if (posX<0) posX+=Comun.MAXX
       }
       //update people
       //ppl.foreach(p => p.update(delta))
@@ -180,7 +185,7 @@ class GameState(var stateID:Int = -1) extends BasicGameState{
         if (e.timeout<=0)
           nextDraw -= e
       }
-
+    print("Position: %d, %d".format(posX,posY))
     }
     if (gc.getInput.isKeyPressed(Input.KEY_ESCAPE)) {
       pause = !pause
@@ -195,11 +200,11 @@ class GameState(var stateID:Int = -1) extends BasicGameState{
     //g.setColor(Color.white)
     //g.drawString("Hello tinygod, %s".format(current), 200, 10)
       //land.draw(0, 0)
-    map.drawLoop(position._1,position._2)
+    map.drawLoop(posX,posY)
 
     for (p: Person <- ppl) {
       //g.drawAnimation(p.currAni, p.x.toFloat, p.y.toFloat)
-      p.currAni.draw(p.x.toFloat+position._1, p.y.toFloat+position._2)
+      p.currAni.draw(posX + p.x.toFloat, posY + p.y.toFloat)
     }
     for (na: Evento <- nextDraw)
       na.ani.draw(na.x - na.ani.getWidth/2, na.y - na.ani.getHeight/2)

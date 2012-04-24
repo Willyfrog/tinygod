@@ -1,16 +1,16 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <map version="1.0" orientation="orthogonal" width="100" height="100" tilewidth="16" tileheight="16">
  <tileset firstgid="1" name="map_tile_old" tilewidth="16" tileheight="16">
-  <image source="./map_tile.png" width="144" height="144"/>
+  <image source="map_tile.png" width="144" height="144"/>
  </tileset>
  <tileset firstgid="82" name="map_tile_old2" tilewidth="16" tileheight="16">
-  <image source="./map_tile.png" width="144" height="144"/>
+  <image source="map_tile.png" width="144" height="144"/>
  </tileset>
  <tileset firstgid="163" name="mapa" tilewidth="16" tileheight="16">
-  <image source="./map_tile.png" width="144" height="144"/>
+  <image source="map_tile.png" width="144" height="144"/>
  </tileset>
  <tileset firstgid="244" name="colision_tiles" tilewidth="16" tileheight="16">
-  <image source="./colision_tiles.png" width="32" height="16"/>
+  <image source="colision_tiles.png" width="32" height="16"/>
  </tileset>
  <layer name="dead" width="100" height="100">
   <data encoding="base64" compression="gzip">

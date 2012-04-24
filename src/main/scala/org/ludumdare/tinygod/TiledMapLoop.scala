@@ -16,7 +16,7 @@ import collection.mutable.ArrayBuffer
 class TiledMapLoop(val path:String, val frameX:Int, val frameY:Int) extends TiledMap(path){
   //def this(val path:String, val frameX:Int, val frameY:Int) = this(path, true, frameX, frameY)
 
-  def drawLoop(posX:Int,posY:Int){
+  def drawLoop(posX:Int, posY:Int){
     // head - tail of the viewport
     var hX:Int = frameX
     var hY:Int = frameY
@@ -33,15 +33,15 @@ class TiledMapLoop(val path:String, val frameX:Int, val frameY:Int) extends Tile
     // draw the upperleft corner of the viewport first
     super.render(0,0,posX,posY,hX,hY)
     // upperright
-    if (tY>0)
+    //if (tY>0)
       super.render(hX,0,0,posY,tX,hY)
     //lowerleft
-    if (tX>0)
+    //if (tX>0)
       super.render(0,hY,posX,0,hX,tY)
     //lowerright
-    if (tX>0 && tY>0)
+    //if (tX>0 && tY>0)
       super.render(hX,hY,0,0,tX,tY)
-
+    //print("draw: position:(%d,%d) -> (%d,%d/%d,%d)\r\n".format(posX,posY,hX,hY,tX,tY))
   }
 
 }
