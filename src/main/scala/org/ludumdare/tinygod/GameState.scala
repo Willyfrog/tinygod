@@ -51,6 +51,7 @@ class GameState(var stateID:Int = -1) extends BasicGameState{
     marco = new Image("world/marco.png")
     end = false
     souls = 0
+    ppl = ArrayBuffer[Person]()
     for (_ <- (1 to Comun.INIPPL)) {
       ppl += new Person(Random.nextInt(800), Random.nextInt(600), Random.nextInt(500)) //personitas colocadas aleatoriamente y con edad variable
     }
@@ -113,23 +114,28 @@ class GameState(var stateID:Int = -1) extends BasicGameState{
 
 //recursiva
   def populationControl(l:ArrayBuffer[Person],delta:Int) {
+    var deads =0
     if (l.length>0){
       var p:Person = l.head
       if (!p.alive) {
         ppl -= p //TODO: replace with a rotting corpse
         if (p.happiness > 0)
           souls += 1
+        Comun.log("Someone died :(")
+
       }
       else{
         p.update(delta)
         if (p.pregnant == 0){
           p.pregnant = -1
           ppl += new Person(p.x+8, p.y+8) //newborn
+          Comun.log("Newborn!")
         }
 
         if (p.blowupTime == 0){
           //nextDraw += new Evento(explosfx,explosion,p.x.toFloat, p.y.toFloat,-30)
           tryHit(p.x.toFloat,p.y.toFloat,explosion,explosfx,-30)
+          Comun.log("Terrorist Exploded!")
         }
         //happiness is affected by events
         for (e<-nextDraw){
@@ -185,7 +191,7 @@ class GameState(var stateID:Int = -1) extends BasicGameState{
         if (e.timeout<=0)
           nextDraw -= e
       }
-    print("Position: %d, %d".format(posX,posY))
+    //print("Position: %d, %d".format(posX,posY))
     }
     if (gc.getInput.isKeyPressed(Input.KEY_ESCAPE)) {
       pause = !pause
@@ -212,6 +218,8 @@ class GameState(var stateID:Int = -1) extends BasicGameState{
     nextDraw.clear()
     marco.draw(0,0)
     g.drawString("Tiniers: %s Souls Collected: %s".format(ppl.length, souls), 20, 580)
+    val log = Comun.minilog.mkString("\r\n")
+    g.drawString(log,400,10)
     if (pause){
       g.drawString("PAUSED",350,290)
       g.drawString("Press Q to exit", 315,310)

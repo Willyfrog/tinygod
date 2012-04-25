@@ -29,4 +29,14 @@ object Comun {
   val OWMAN = "oldwoman"
   val TERR = "terrorist"
 
+  var minilog:List[String] = List()
+
+  def log(info:String)  {
+    if (minilog.length > 4)
+     minilog = minilog.tail ::: List(info)
+    else
+      minilog = minilog ::: List(info)
+    print(minilog)
+  }
+
 }
